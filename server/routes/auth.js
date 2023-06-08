@@ -1,10 +1,6 @@
-const express = require('express');
+import { signup, login } from "../controllers/auth.js";
 
-const { signup, login } = require('../controllers/auth.js');
-
-const router = express.Router();
-
-router.post('/signup', signup);
-router.post('/login', login);
-
-module.exports = router;
+export default async function authRoutes(fastify) {
+  fastify.post("/auth/signup", signup);
+  fastify.post("/auth/login", login);
+}

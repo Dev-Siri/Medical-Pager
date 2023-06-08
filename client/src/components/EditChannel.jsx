@@ -1,42 +1,48 @@
-import React, { useState } from 'react';
-import { useChatContext } from 'stream-chat-react';
+import { useState, lazy } from "react";
+import { useChatContext } from "stream-chat-react";
 
-import { UserList } from './'
-import { CloseCreateChannel } from '../assets';
+import { CloseCreateChannel } from "../assets";
 
-const ChannelNameInput = ({ channelName = '', setChannelName }) => {
+const UserList = lazy(() => import("./UserList"));
 
-  const handleChange = (event) => {
+function ChannelNameInput({ channelName = "", setChannelName }) {
+  function handleChange(event) {
     event.preventDefault();
 
-    setChannelName(event.target.value)
+    setChannelName(event.target.value);
   }
 
-  return(
-    <div className='channel-name-input__wrapper'>
+  return (
+    <div className="channel-name-input__wrapper">
       <p>Name</p>
-      <input value={channelName} onChange={handleChange} placeholder="channel-name" />
+      <input
+        value={channelName}
+        onChange={handleChange}
+        placeholder="channel-name"
+      />
       <p>Add Members</p>
     </div>
-  )
+  );
 }
 
-const EditChannel = ({ setIsEditing }) => {
-
+export default function EditChannel({ setIsEditing }) {
   const { channel } = useChatContext();
   const [channelName, setChannelName] = useState(channel?.data?.name);
   const [selectedUsers, setSelectedUsers] = useState([]);
 
-  const updateChannel = async (event) => {
+  async function updateChannel(event) {
     event.preventDefault();
 
     const nameChanged = channelName !== (channel.data.name || channel.data.id);
 
-    if(nameChanged) {
-      await channel.update({ name: channelName }, { text: `Channel name changed to ${channelName}` })
+    if (nameChanged) {
+      await channel.update(
+        { name: channelName },
+        { text: `Channel name changed to ${channelName}` }
+      );
     }
 
-    if(selectedUsers.length) {
+    if (selectedUsers.length) {
       await channel.addMembers(selectedUsers);
     }
 
@@ -46,18 +52,19 @@ const EditChannel = ({ setIsEditing }) => {
   }
 
   return (
-    <div className='edit-channel__container'>
-      <div className='edit-channel__header'>
+    <div className="edit-channel__container">
+      <div className="edit-channel__header">
         <p>Edit Channel</p>
         <CloseCreateChannel setIsEditing={setIsEditing} />
       </div>
-      <ChannelNameInput channelName={channelName} setChannelName={setChannelName} />
+      <ChannelNameInput
+        channelName={channelName}
+        setChannelName={setChannelName}
+      />
       <UserList setSelectedUsers={setSelectedUsers} />
-      <div className='edit-channel__button-wrapper' onClick={updateChannel}>
+      <div className="edit-channel__button-wrapper" onClick={updateChannel}>
         <p>Save Changes</p>
       </div>
     </div>
-  )
+  );
 }
-
-export default EditChannel;
